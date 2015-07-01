@@ -39,11 +39,11 @@
 (require 'artist)
 (require 'flx-ido)
 
-(defvar popup-imenu--use-flx t
+(defvar popup-imenu-use-flx t
   "Turns on flx matching")
 
 (defun popup-imenu--filter ()
-  (if popup-imenu--use-flx
+  (if popup-imenu-use-flx
       'popup-imenu--flx-match
     'popup-isearch-filter-list))
 
