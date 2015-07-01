@@ -42,6 +42,9 @@
 (defvar popup-imenu-use-flx t
   "Turns on flx matching")
 
+(defvar popup-imenu-hide-rescan t
+  "Hide *Rescan* menu item")
+
 (defun popup-imenu--filter ()
   (if popup-imenu-use-flx
       'popup-imenu--flx-match
@@ -87,10 +90,17 @@
        (list x)))
    menu-index))
 
+(defun popup-imenu--index ()
+  (let ((popup-index (imenu--make-index-alist)))
+    (if popup-imenu-hide-rescan
+        (delq imenu--rescan-item popup-index)
+      popup-index
+      )))
+
 ;;;###autoload
 (defun popup-imenu ()
   (interactive)
-  (let* ((popup-list (popup-imenu--flatten-index (imenu--make-index-alist)))
+  (let* ((popup-list (popup-imenu--flatten-index (popup-imenu--index)))
          (menu-height (min 15 (length popup-list) (- (window-height) 4)))
          (popup-items popup-list)
          (line-number (save-excursion
