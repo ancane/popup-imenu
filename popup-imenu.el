@@ -45,6 +45,13 @@
 (defvar popup-imenu-hide-rescan t
   "Hide *Rescan* menu item")
 
+(defvar popup-imenu-position 'fill-column
+  "Defines popup position.
+   Possible values are one of:
+   'center - opens popup at window center
+   'fill-column - center relative to fill-column
+   'point - open popup at point")
+
 (defun popup-imenu--filter ()
   (if popup-imenu-use-flx
       'popup-imenu--flx-match
@@ -97,29 +104,33 @@
       popup-index
       )))
 
+(defun popup-imenu--pos (popup-items)
+  (if (eq popup-imenu-position 'point)
+      (point)
+    (let* ((line-number (save-excursion
+                         (goto-char (window-start))
+                         (line-number-at-pos)))
+          (x (+ (/ (- (if (eq popup-imenu-position 'center) (window-width) fill-column)
+                      (apply 'max (mapcar (lambda (z) (length (car z))) popup-items)))
+                   2)
+                (window-hscroll)))
+          (y (+ (- line-number 2)
+                (/ (- (window-height) menu-height) 2))))
+      (save-excursion
+        (artist-move-to-xy x y)
+        (point)))))
+
 ;;;###autoload
 (defun popup-imenu ()
   (interactive)
   (let* ((popup-list (popup-imenu--flatten-index (popup-imenu--index)))
          (menu-height (min 15 (length popup-list) (- (window-height) 4)))
-         (popup-items popup-list)
-         (line-number (save-excursion
-                        (goto-char (window-start))
-                        (line-number-at-pos)))
-         (x (+ (/ (- fill-column
-                     (apply 'max (mapcar (lambda (x) (length (car x))) popup-list)))
-                  2)
-               (window-hscroll)))
-         (y (+ (- line-number 2)
-               (/ (- (window-height) menu-height) 2)))
-         (menu-pos (save-excursion
-                     (artist-move-to-xy x y)
-                     (point)))
+         (popup-items (mapcar
+                       (lambda (x) (popup-make-item (car x) :value x))
+                       popup-list))
          (selected (popup-menu*
-                    (mapcar
-                     (lambda (x) (popup-make-item (car x) :value x))
-                     popup-list)
-                    :point menu-pos
+                    popup-items
+                    :point (popup-imenu--pos popup-list)
                     :height menu-height
                     :isearch t
                     :isearch-filter (popup-imenu--filter)
