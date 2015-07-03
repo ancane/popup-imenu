@@ -39,7 +39,7 @@
 (require 'artist)
 (require 'flx-ido)
 
-(defvar popup-imenu-use-flx t
+(defvar popup-imenu-fuzzy-match t
   "Turns on flx matching")
 
 (defvar popup-imenu-hide-rescan t
@@ -53,7 +53,7 @@
    'point - open popup at point")
 
 (defun popup-imenu--filter ()
-  (if popup-imenu-use-flx
+  (if popup-imenu-fuzzy-match
       'popup-imenu--flx-match
     'popup-isearch-filter-list))
 
