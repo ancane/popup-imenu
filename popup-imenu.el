@@ -138,7 +138,8 @@
                     :margin-left 1
                     :margin-right 1
                     )))
-    (goto-char (cdr selected))))
+    (goto-char (cdr selected))
+    (beginning-of-line-text)))
 
 (provide 'popup-imenu)
 
