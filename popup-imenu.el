@@ -2,7 +2,7 @@
 
 ;; Author: Igor Shymko <igor.shimko@gmail.com>
 ;; Version: 0.1
-;; Package-Requires: ((dash "2.9.0") (popup "0.5.3") (flx-ido "0.5"))
+;; Package-Requires: ((dash "2.12.1") (popup "0.5.3") (flx-ido "0.6.1"))
 ;; Keywords: popup, imenu
 ;; URL: https://github.com/ancane/popup-imenu.el
 
@@ -114,8 +114,9 @@ IMENU-INDEX - imenu index tree."
       popup-index
       )))
 
-(defun popup-imenu--pos (popup-items)
+(defun popup-imenu--pos (menu-height popup-items)
   "Return the possition for a popup menu.
+MENU-HEIGHT - required menu height,
 POPUP-ITEMS - items to be shown in the popup."
   (if (eq popup-imenu-position 'point)
       (point)
@@ -143,7 +144,7 @@ POPUP-ITEMS - items to be shown in the popup."
                        popup-list))
          (selected (popup-menu*
                     popup-items
-                    :point (popup-imenu--pos popup-list)
+                    :point (popup-imenu--pos menu-height popup-list)
                     :height menu-height
                     :isearch t
                     :isearch-filter (popup-imenu--filter)
