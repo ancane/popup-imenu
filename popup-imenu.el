@@ -40,24 +40,27 @@
 (require 'flx-ido)
 
 (defvar popup-imenu-fuzzy-match t
-  "Turns on flx matching")
+  "Turns on flx matching.")
 
 (defvar popup-imenu-hide-rescan t
-  "Hide *Rescan* menu item")
+  "Hide *Rescan* menu item.")
 
 (defvar popup-imenu-position 'fill-column
-  "Defines popup position.
-   Possible values are one of:
-   'center - opens popup at window center
-   'fill-column - center relative to fill-column
-   'point - open popup at point")
+  "Defines popup position.  Possible values are one of:
+'center - opens popup at window center
+'fill-column - center relative to `fill-column'
+'point - open popup at point.")
 
 (defun popup-imenu--filter ()
+  "Function that return either flx or a regular filterring function."
   (if popup-imenu-fuzzy-match
       'popup-imenu--flx-match
     'popup-isearch-filter-list))
 
 (defun popup-imenu--flx-match (query items)
+  "Flx filtering function.
+QUERY - search string
+ITEMS - popup menu items list"
   (let ((flex-result (flx-flex-match query items)))
     (let* ((matches (cl-loop for item in flex-result
                              for string = (ido-name item)
@@ -73,6 +76,8 @@
         t)))))
 
 (defun popup-imenu--flx-decorate (things)
+  "Highlight imenu items mathing search string.
+THINGS - popup menu items list"
   (if flx-ido-use-faces
       (let ((decorate-count (min ido-max-prospects
                                  (length things))))
@@ -84,20 +89,25 @@
     (mapcar 'car things)))
 
 (defun popup-imenu--propertize (thing)
+  "Add value property to imenu item to be returned in case of thing selection.
+THING - imenu item."
   (let* ((item-value (popup-item-value (car thing)))
          (flx-propertized (flx-propertize (car thing) (cdr thing))))
     (popup-item-propertize flx-propertized 'value item-value)))
 
-(defun popup-imenu--flatten-index (menu-index)
+(defun popup-imenu--flatten-index (imenu-index)
+  "Flatten imenu index into a plain list.
+IMENU-INDEX - imenu index tree."
   (-mapcat
    (lambda (x)
      (if (imenu--subalist-p x)
          (mapcar (lambda (y) (cons (concat (car x) ":" (car y)) (cdr y)))
                  (popup-imenu--flatten-index (cdr x)))
        (list x)))
-   menu-index))
+   imenu-index))
 
 (defun popup-imenu--index ()
+  "Build imenu index."
   (let ((popup-index (imenu--make-index-alist)))
     (if popup-imenu-hide-rescan
         (delq imenu--rescan-item popup-index)
@@ -105,6 +115,8 @@
       )))
 
 (defun popup-imenu--pos (popup-items)
+  "Return the possition for a popup menu.
+POPUP-ITEMS - items to be shown in the popup."
   (if (eq popup-imenu-position 'point)
       (point)
     (let* ((line-number (save-excursion
@@ -122,6 +134,7 @@
 
 ;;;###autoload
 (defun popup-imenu ()
+  "Open the popup window with imenu items."
   (interactive)
   (let* ((popup-list (popup-imenu--flatten-index (popup-imenu--index)))
          (menu-height (min 15 (length popup-list) (- (window-height) 4)))
