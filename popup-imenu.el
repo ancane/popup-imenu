@@ -52,7 +52,7 @@
 'point - open popup at point.")
 
 (defun popup-imenu--filter ()
-  "Function that return either flx or a regular filterring function."
+  "Function that return either flx or a regular filtering function."
   (if popup-imenu-fuzzy-match
       'popup-imenu--flx-match
     'popup-isearch-filter-list))
@@ -76,7 +76,7 @@ ITEMS - popup menu items list"
         t)))))
 
 (defun popup-imenu--flx-decorate (things)
-  "Highlight imenu items mathing search string.
+  "Highlight imenu items matching search string.
 THINGS - popup menu items list"
   (if flx-ido-use-faces
       (let ((decorate-count (min ido-max-prospects
@@ -115,7 +115,7 @@ IMENU-INDEX - imenu index tree."
       )))
 
 (defun popup-imenu--pos (menu-height popup-items)
-  "Return the possition for a popup menu.
+  "Return the position for a popup menu.
 MENU-HEIGHT - required menu height,
 POPUP-ITEMS - items to be shown in the popup."
   (if (eq popup-imenu-position 'point)
