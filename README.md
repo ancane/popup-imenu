@@ -1,11 +1,16 @@
 # Popup-imenu
 
-Select imenu items via popup window with fuzzy matching.
+Can show imenu index from any imenu-ready mode in a popup window.
+Fuzzy search supported.
 
-## popup-imenu
-Opens the popup.
+![popup-imenu gif](https://github.com/ancane/popup-imenu/raw/master/popup-imenu.gif)
 
-## popup-imenu-position
+## Run
+`M-x popup-imenu`
+
+## Customize
+
+### popup-imenu-position
 
 Variable controls popup horizontal positioning.
 Possible values are:
@@ -18,9 +23,9 @@ Possible values are:
 (setq popup-imenu-position 'point)
 ```
 
-## popup-imenu-fuzzy-match
+### popup-imenu-fuzzy-match
 Fuzzy matching is enabled by default.
-Disables it with:
+Disable it with:
 
 ```
 (setq popup-imenu-fuzzy-match nil)
