@@ -139,7 +139,7 @@ POPUP-ITEMS - items to be shown in the popup."
 
 (defun popup-imenu--point-at-col-row (column row)
   (save-excursion
-    (goto-line row)
+    (forward-line row)
     (move-to-column column popup-imenu-force-position)
     (point)))
 
