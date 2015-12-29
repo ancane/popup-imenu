@@ -1,7 +1,7 @@
 ;;; popup-imenu.el --- imenu index popup
 
 ;; Author: Igor Shymko <igor.shimko@gmail.com>
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ((dash "2.12.1") (popup "0.5.3") (flx-ido "0.6.1"))
 ;; Keywords: popup, imenu
 ;; URL: https://github.com/ancane/popup-imenu.el
@@ -25,7 +25,7 @@
 ;;
 ;;; Commentary:
 ;;
-;; Displays imenu index in a popup window. Fuzzy matching supported.
+;; Shows imenu index in a popup window. Fuzzy matching supported.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
