@@ -162,8 +162,7 @@ POPUP-ITEMS - items to be shown in the popup."
                     :margin-left 1
                     :margin-right 1
                     )))
-    (goto-char (cdr selected))
-    (beginning-of-line-text)))
+    (goto-char (cdr selected))))
 
 (provide 'popup-imenu)
 
