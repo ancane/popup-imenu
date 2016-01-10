@@ -1,5 +1,10 @@
 # Popup-imenu
 
+[![MELPA](http://melpa.org/packages/popup-imenu-badge.svg)](http://melpa.org/#/popup-imenu)
+[![MELPA Stable](http://stable.melpa.org/packages/popup-imenu-badge.svg)](http://stable.melpa.org/#/popup-imenu)
+
+> **imenu index popup**
+
 Can show imenu index from any imenu-ready mode in a popup window.
 Fuzzy search supported.
 
