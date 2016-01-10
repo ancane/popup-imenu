@@ -1,5 +1,10 @@
 # Popup-imenu
 
+[![MELPA](http://melpa.org/packages/popup-imenu-badge.svg)](http://melpa.org/#/popup-imenu)
+[![MELPA Stable](http://stable.melpa.org/packages/popup-imenu-badge.svg)](http://stable.melpa.org/#/popup-imenu)
+
+> **imenu index popup**
+
 Can show imenu index from any imenu-ready mode in a popup window.
 Fuzzy search supported.
 
@@ -13,13 +18,14 @@ Fuzzy search supported.
 ### popup-imenu-position
 
 Variable controls popup horizontal positioning.
+
 Possible values are:
 
-*  'center - opens popup at window center
-*  'fill-column - center relative to fill-column (default setting)
-*  'point - open popup at point
+* `'center` - opens popup at window center
+* `'fill-column` - center relative to fill-column (default setting)
+* `'point` - open popup at point
 
-```
+```lisp
 (setq popup-imenu-position 'point)
 ```
 
@@ -27,13 +33,13 @@ Possible values are:
 Fuzzy matching is enabled by default.
 Disable it with:
 
-```
+```lisp
 (setq popup-imenu-fuzzy-match nil)
 ```
 
 ## Keymap
 
-```
+```lisp
 (global-set-key (kbd "C-e") 'popup-imenu)
 
 ;; Close the popup with same key
