@@ -1,10 +1,10 @@
 ;;; popup-imenu.el --- imenu index popup
 
 ;; Author: Igor Shymko <igor.shimko@gmail.com>
-;; Version: 0.3
-;; Package-Requires: ((dash "2.12.1") (popup "0.5.3") (flx-ido "0.6.1"))
-;; Keywords: popup, imenu
-;; URL: https://github.com/ancane/popup-imenu
+;; Version: 0.4
+;; Package-Requires: ((dash "2.12.1") (popup "0.5.3") (flx-popup "0.1") (cl-lib "0.5"))
+;; Keywords: popup, imenu, flx
+;; URL: https://github.com/ancane/popup-imenu.el
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -25,18 +25,17 @@
 ;;
 ;;; Commentary:
 ;;
-;; Shows imenu index in a popup window. Fuzzy matching supported.
+;; Show imenu index in a popup with flex matching support.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-
+(require 'cl-lib)
 (require 'dash)
 (require 'popup)
 (require 'imenu)
-(require 'flx-ido)
+(require 'flx-popup)
 
 (defvar popup-imenu-fuzzy-match t
   "Turns on flx matching.")
@@ -59,31 +58,53 @@ Setting this var to `t' will add whitespaces at the end of the line to reach the
 (defun popup-imenu--filter ()
   "Function that return either flx or a regular filtering function."
   (if popup-imenu-fuzzy-match
-      'popup-imenu--flx-match
+      'flx-popup-match
     'popup-isearch-filter-list))
 
 (defun popup-imenu--flx-match (query items)
   "Flx filtering function.
 QUERY - search string
 ITEMS - popup menu items list"
-  (let ((flex-result (flx-flex-match query items)))
+  (let ((flex-result (popup-imenu--flx-flex-match query items)))
     (let* ((matches (cl-loop for item in flex-result
-                             for string = (ido-name item)
+                             for string = (if (consp item) (car item) item)
                              for score = (flx-score string query flx-file-cache)
                              if score
                              collect (cons item score)
                              into matches
                              finally return matches)))
       (popup-imenu--flx-decorate
-       (delete-consecutive-dups
-        (sort matches
-              (lambda (x y) (> (cadr x) (cadr y))))
-        t)))))
+       (sort matches (lambda (x y) (> (cadr x) (cadr y))))
+       ))))
+
+(defun popup-imenu--flx-flex-match (query items)
+  "Implement flex matching. Keep duplicates."
+  (if (zerop (length query))
+      items
+    (let* ((case-fold-search nil) ;; case sensitive
+           (re (popup-imenu--query-to-regexp query)))
+      (-filter
+       (lambda (item) (string-match re item))
+       items))))
+
+(defun popup-imenu--query-to-regexp (query)
+  "Convert QUERY to flx style case folding regexp."
+  (let* ((breakdown-str (mapcar
+                         (lambda (c)
+                           (apply 'string c (when (= (downcase c) c)
+                                              (list (upcase c)))))
+                         query))
+         (re (concat (format "[%s]" (nth 0 breakdown-str))
+                     (mapconcat
+                      (lambda (c) (format "[^%s]*[%s]" c c))
+                      (cdr breakdown-str) ""))))
+    re))
+
 
 (defun popup-imenu--flx-decorate (things)
   "Highlight imenu items matching search string.
 THINGS - popup menu items list"
-  (if flx-ido-use-faces
+  (if flx-popup-use-faces
       (let ((decorate-count (min ido-max-prospects
                                  (length things))))
         (nconc
@@ -150,7 +171,7 @@ POPUP-ITEMS - items to be shown in the popup."
   (let* ((popup-list (popup-imenu--flatten-index (popup-imenu--index)))
          (menu-height (min 15 (length popup-list) (- (window-height) 4)))
          (popup-items (mapcar
-                       (lambda (x) (popup-make-item (car x) :value x))
+                       (lambda (x) (popup-make-item (car x) :value x ))
                        popup-list))
          (selected (popup-menu*
                     popup-items
