@@ -1,7 +1,7 @@
 ;;; popup-imenu.el --- imenu index popup
 
 ;; Author: Igor Shymko <igor.shimko@gmail.com>
-;; Version: 0.3
+;; Version: 0.4
 ;; Package-Requires: ((dash "2.12.1") (popup "0.5.3") (flx-ido "0.6.1"))
 ;; Keywords: popup, imenu
 ;; URL: https://github.com/ancane/popup-imenu
@@ -45,10 +45,15 @@
   "Hide *Rescan* menu item.")
 
 (defvar popup-imenu-position 'point
-  "Defines popup position.  Possible values are one of:
+  "Defines popup position.  Possible values are:
 'point - open popup at point. (default option)
 'center - opens popup at window center
 'fill-column - center relative to `fill-column'")
+
+(defvar popup-imenu-style 'flat
+  "Defines a way to present hierarchical imenus. Possible values are:
+'flat - flattened imenu representation
+'indent - subitems indented by 2 spaces")
 
 (defvar popup-imenu-force-position nil
   "When popup position, as calculated according to 'center or 'fill-column settings,
@@ -111,6 +116,33 @@ IMENU-INDEX - imenu index tree."
        (list x)))
    imenu-index))
 
+(defun popup-imenu--indent-index (imenu-index &optional indent)
+  "Indent hierarchical subitems with spaces.
+IMENU-INDEX - imenu index tree."
+  (-mapcat
+   (lambda (x)
+     (if (imenu--subalist-p x)
+         (let ((cur-item (cons (car x) (cdr (car (cdr x)))))
+               (cur-subitems (if (string= "." (car (car (cdr x))))
+                                 (cdr (cdr x))
+                               (cdr x)
+                               )))
+           (cons cur-item
+                 (mapcar (lambda (y) (cons (concat (or indent "  ") (car y)) (cdr y)))
+                         (popup-imenu--indent-index cur-subitems (concat indent "  ")))))
+       (list x)))
+   imenu-index))
+
+(defun popup-imenu--build-popup-items-in-style (index-items)
+  (if (eq popup-imenu-style 'flat)
+      (mapcar
+       (lambda (x) (popup-make-item (car x) :value x))
+       (popup-imenu--flatten-index index-items))
+    (mapcar
+     (lambda (x) (popup-make-item (car x) :value x))
+     (popup-imenu--indent-index index-items)))
+  )
+
 (defun popup-imenu--index ()
   "Build imenu index."
   (let ((popup-index (imenu--make-index-alist)))
@@ -147,11 +179,11 @@ POPUP-ITEMS - items to be shown in the popup."
 (defun popup-imenu ()
   "Open the popup window with imenu items."
   (interactive)
-  (let* ((popup-list (popup-imenu--flatten-index (popup-imenu--index)))
+  (let* ((popup-list (popup-imenu--index))
          (menu-height (min 15 (length popup-list) (- (window-height) 4)))
-         (popup-items (mapcar
-                       (lambda (x) (popup-make-item (car x) :value x))
-                       popup-list))
+
+         (popup-items (popup-imenu--build-popup-items-in-style popup-list))
+
          (selected (popup-menu*
                     popup-items
                     :point (popup-imenu--pos menu-height popup-list)
