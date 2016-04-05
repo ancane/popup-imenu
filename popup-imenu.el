@@ -180,10 +180,8 @@ POPUP-ITEMS - items to be shown in the popup."
   "Open the popup window with imenu items."
   (interactive)
   (let* ((popup-list (popup-imenu--index))
-         (menu-height (min 15 (length popup-list) (- (window-height) 4)))
-
-         (popup-items (popup-imenu--build-popup-items-in-style popup-list))
-
+	 (popup-items (popup-imenu--build-popup-items-in-style popup-list))
+	 (menu-height (min 15 (length popup-items) (- (window-height) 4)))
          (selected (popup-menu*
                     popup-items
                     :point (popup-imenu--pos menu-height popup-list)
