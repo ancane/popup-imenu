@@ -71,19 +71,20 @@ Setting this var to `t' will add whitespaces at the end of the line to reach the
   "Flx filtering function.
 QUERY - search string
 ITEMS - popup menu items list"
-  (let ((flex-result (flx-flex-match query items)))
-    (let* ((matches (cl-loop for item in flex-result
-                             for string = (ido-name item)
-                             for score = (flx-score string query flx-file-cache)
-                             if score
-                             collect (cons item score)
-                             into matches
-                             finally return matches)))
-      (popup-imenu--flx-decorate
-       (delete-consecutive-dups
-        (sort matches
-              (lambda (x y) (> (cadr x) (cadr y))))
-        t)))))
+  (if (> (length query) 0)
+      (let ((flex-result (flx-flex-match query items)))
+	(let* ((matches (cl-loop for item in flex-result
+				 for string = (ido-name item)
+				 for score = (flx-score string query flx-file-cache)
+				 if score
+				 collect (cons item score)
+				 into matches
+				 finally return matches)))
+	  (popup-imenu--flx-decorate
+	   (sort matches
+		 (lambda (x y) (> (cadr x) (cadr y))))
+	   )))
+    items))
 
 (defun popup-imenu--flx-decorate (things)
   "Highlight imenu items matching search string.
@@ -197,3 +198,4 @@ POPUP-ITEMS - items to be shown in the popup."
 (provide 'popup-imenu)
 
 ;;; popup-imenu.el ends here
+
