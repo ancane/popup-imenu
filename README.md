@@ -3,10 +3,7 @@
 [![MELPA](http://melpa.org/packages/popup-imenu-badge.svg)](http://melpa.org/#/popup-imenu)
 [![MELPA Stable](http://stable.melpa.org/packages/popup-imenu-badge.svg)](http://stable.melpa.org/#/popup-imenu)
 
-> **imenu index popup**
-
-Can show imenu index from any imenu-ready mode in a popup window.
-Fuzzy search supported.
+Show imenu index alist in a popup window.
 
 ![popup-imenu gif](https://github.com/ancane/popup-imenu/raw/master/popup-imenu.gif)
 
@@ -17,20 +14,26 @@ Fuzzy search supported.
 
 ### popup-imenu-position
 
-Variable controls popup horizontal positioning.
+Control popup horizontal positioning with:
 
-Possible values are:
-
-* `'center` - opens popup at window center
+* `'center` - open popup at window center
 * `'fill-column` - center relative to fill-column (default setting)
 * `'point` - open popup at point
 
 ```lisp
 (setq popup-imenu-position 'point)
 ```
+### popup-imenu-style
+
+* `'flat` - flatten hierarchical imenu
+* `'indent` - use whitespace indentation to show hierarchical imenu
+
+```lisp
+(setq popup-imenu-style 'indent)
+```
 
 ### popup-imenu-fuzzy-match
-Fuzzy matching is enabled by default.
+Flx matching is enabled by default.
 Disable it with:
 
 ```lisp
