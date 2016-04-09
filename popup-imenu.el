@@ -1,7 +1,7 @@
 ;;; popup-imenu.el --- imenu index popup
 
 ;; Author: Igor Shymko <igor.shimko@gmail.com>
-;; Version: 0.4
+;; Version: 0.5
 ;; Package-Requires: ((dash "2.12.1") (popup "0.5.3") (flx-ido "0.6.1"))
 ;; Keywords: popup, imenu
 ;; URL: https://github.com/ancane/popup-imenu
@@ -73,17 +73,17 @@ QUERY - search string
 ITEMS - popup menu items list"
   (if (> (length query) 0)
       (let ((flex-result (flx-flex-match query items)))
-	(let* ((matches (cl-loop for item in flex-result
-				 for string = (ido-name item)
-				 for score = (flx-score string query flx-file-cache)
-				 if score
-				 collect (cons item score)
-				 into matches
-				 finally return matches)))
-	  (popup-imenu--flx-decorate
-	   (sort matches
-		 (lambda (x y) (> (cadr x) (cadr y))))
-	   )))
+        (let* ((matches (cl-loop for item in flex-result
+                                 for string = (ido-name item)
+                                 for score = (flx-score string query flx-file-cache)
+                                 if score
+                                 collect (cons item score)
+                                 into matches
+                                 finally return matches)))
+          (popup-imenu--flx-decorate
+           (sort matches
+                 (lambda (x y) (> (cadr x) (cadr y))))
+           )))
     items))
 
 (defun popup-imenu--flx-decorate (things)
@@ -112,7 +112,12 @@ IMENU-INDEX - imenu index tree."
   (-mapcat
    (lambda (x)
      (if (imenu--subalist-p x)
-         (mapcar (lambda (y) (cons (concat (car x) ":" (car y)) (cdr y)))
+         (mapcar (lambda (y)
+                   (if (string= "." (car y))
+                       (cons (car x) (cdr y))
+                     (cons (concat (car x) ":" (car y)) (cdr y))
+                     )
+                   )
                  (popup-imenu--flatten-index (cdr x)))
        (list x)))
    imenu-index))
@@ -181,8 +186,8 @@ POPUP-ITEMS - items to be shown in the popup."
   "Open the popup window with imenu items."
   (interactive)
   (let* ((popup-list (popup-imenu--index))
-	 (popup-items (popup-imenu--build-popup-items-in-style popup-list))
-	 (menu-height (min 15 (length popup-items) (- (window-height) 4)))
+         (popup-items (popup-imenu--build-popup-items-in-style popup-list))
+         (menu-height (min 15 (length popup-items) (- (window-height) 4)))
          (selected (popup-menu*
                     popup-items
                     :point (popup-imenu--pos menu-height popup-list)
