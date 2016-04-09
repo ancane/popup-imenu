@@ -115,8 +115,11 @@ IMENU-INDEX - imenu index tree."
          (mapcar (lambda (y)
                    (if (string= "." (car y))
                        (cons (car x) (cdr y))
-                     (cons (concat (car x) ":" (car y)) (cdr y))
-                     )
+
+		     (let ((elem (concat (car x) ":" (car y))))
+		       (set-text-properties 0 1 (text-properties-at 0 (car y)) elem)
+		       (cons elem (cdr y)))
+		     )
                    )
                  (popup-imenu--flatten-index (cdr x)))
        (list x)))
@@ -142,7 +145,9 @@ IMENU-INDEX - imenu index tree."
 (defun popup-imenu--build-popup-items-in-style (index-items)
   (if (eq popup-imenu-style 'flat)
       (mapcar
-       (lambda (x) (popup-make-item (car x) :value x))
+       (lambda (x)
+	 (message (format "symbol === %s" (get-text-property 0 'symbol (car x))))
+	 (popup-make-item (car x) :value x :symbol (get-text-property 0 'symbol (car x))))
        (popup-imenu--flatten-index index-items))
     (mapcar
      (lambda (x) (popup-make-item (car x) :value x))
@@ -197,6 +202,7 @@ POPUP-ITEMS - items to be shown in the popup."
                     :scroll-bar nil
                     :margin-left 1
                     :margin-right 1
+                    :symbol t
                     )))
     (goto-char (cdr selected))))
 
