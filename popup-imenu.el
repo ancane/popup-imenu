@@ -38,28 +38,57 @@
 (require 'imenu)
 (require 'flx-ido)
 
-(defvar popup-imenu-fuzzy-match t
-  "Turns on flx matching.")
+(defgroup popup-imenu nil
+  "Shows imenu index in a popup window."
+  :group 'imenu
+  :link '(url-link :tag "popup-imenu @ GitHub"
+                   "https://github.com/ancane/popup-imenu"))
 
-(defvar popup-imenu-hide-rescan t
-  "Hide *Rescan* menu item.")
+(defcustom popup-imenu-fuzzy-match t
+  "Turns on flx matching."
+  :group 'popup-imenu
+  :type 'boolean
+  :safe #'booleanp)
 
-(defvar popup-imenu-position 'point
+(defcustom popup-imenu-hide-rescan t
+  "Hide *Rescan* menu item."
+  :group 'popup-imenu
+  :type 'boolean
+  :safe #'booleanp)
+
+(defcustom popup-imenu-position 'point
   "Defines popup position.  Possible values are:
 'point - open popup at point. (default option)
 'center - opens popup at window center
-'fill-column - center relative to `fill-column'")
+'fill-column - center relative to `fill-column'"
+  :group 'popup-imenu
+  :type '(choice
+          (const :tag "point - open popup at point" point)
+          (const :tag "center - opens popup at window center" center)
+          (const :tag "fill-column - center relative to `fill-column'" fill-column)))
 
-(defvar popup-imenu-style 'flat
+(defcustom popup-imenu-style 'flat
   "Defines a way to present hierarchical imenus. Possible values are:
 'flat - flattened imenu representation
-'indent - subitems indented by 2 spaces")
+'indent - subitems indented by 2 spaces"
+  :group 'popup-imenu
+  :type '(choice
+          (const :tag "flat - flattened imenu representation" flat)
+          (const :tag "indent - subitems indented by 2 spaces" indent)))
 
-(defvar popup-imenu-force-position nil
+(defcustom popup-imenu-force-position nil
   "When popup position, as calculated according to 'center or 'fill-column settings,
 points to a line that is not long enough, then popup will not be open at
 'center or 'fill-column position.
-Setting this var to `t' will add whitespaces at the end of the line to reach the column.")
+Setting this var to `t' will add whitespaces at the end of the line to reach the column."
+  :group 'popup-imenu
+  :type 'boolean
+  :safe #'booleanp)
+
+(defcustom popup-imenu-max-items 15
+  "Maximum number of elements in a mouse menu for Imenu."
+  :group 'popup-imenu
+  :type 'integer)
 
 (defun popup-imenu--filter ()
   "Function that return either flx or a regular filtering function."
@@ -200,7 +229,7 @@ POPUP-ITEMS - items to be shown in the popup."
   (interactive)
   (let* ((popup-list (popup-imenu--index))
          (popup-items (popup-imenu--build-popup-items-in-style popup-list))
-         (menu-height (min 15 (length popup-items) (- (window-height) 4)))
+         (menu-height (min popup-imenu-max-items (length popup-items) (- (window-height) 4)))
          (selected (popup-menu*
                     popup-items
                     :point (popup-imenu--pos menu-height popup-list)
@@ -216,5 +245,3 @@ POPUP-ITEMS - items to be shown in the popup."
 (provide 'popup-imenu)
 
 ;;; popup-imenu.el ends here
-
-
